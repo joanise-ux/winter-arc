@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PhotoCard } from '../components/PhotoCard';
 import { Bar, Card, PeriodNav, Stat, pctText } from '../components/ui';
 import { DOW_SHORT, addDays, fmtNum, fmtShort, parseKey, startOfWeek } from '../lib/dates';
 import { PASS, weekSummary, type CounterStat, type TaskRate, type WorkoutStat } from '../lib/stats';
@@ -132,6 +133,8 @@ export function Week({ today }: { today: string }) {
       <Card code="W4" title="Zadania dzienne">
         <TaskRates rates={w.perTask.filter((r) => r.task.kind === 'check')} />
       </Card>
+
+      <PhotoCard weekStart={weekStart} today={today} onJump={setWeekStart} />
     </>
   );
 }

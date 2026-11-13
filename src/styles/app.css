@@ -874,6 +874,128 @@ main {
   background: rgba(var(--accent-rgb), 0.12);
 }
 
+/* ───── Zdjęcia postępów ───── */
+.photos {
+  display: grid;
+  gap: 8px;
+  max-width: 260px;
+}
+.photos.two {
+  grid-template-columns: 1fr 1fr;
+  max-width: none;
+}
+.photo {
+  position: relative;
+  padding: 0;
+  background: var(--raised);
+  border: 1px solid var(--line-strong);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+}
+.photo img,
+.strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.photo span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 3px 8px;
+  background: rgba(10, 11, 13, 0.78);
+  color: var(--text);
+  font-size: 11px;
+}
+.photo-full {
+  width: 100%;
+  max-height: 68dvh;
+  object-fit: contain;
+  background: #000;
+}
+.strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  margin-top: 12px;
+  padding-bottom: 4px;
+}
+.strip button {
+  position: relative;
+  flex: none;
+  width: 56px;
+  height: 74px;
+  padding: 0;
+  background: var(--raised);
+  border: 1px solid var(--line);
+}
+.strip button.on {
+  border-color: var(--accent);
+}
+.strip span {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 1px 4px;
+  background: rgba(10, 11, 13, 0.78);
+  font-size: 10px;
+  color: var(--text);
+}
+.photos + .hint,
+.strip + .hint,
+.card > input + .hint + .hint {
+  margin-top: 12px;
+}
+
+/* ───── Przypomnienia ───── */
+.reminder {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  grid-template-areas: 'time del' 'label label' 'g g';
+  align-items: center;
+  gap: 6px 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.reminder input {
+  min-width: 0;
+  height: 44px;
+  padding: 0 10px;
+  background: var(--raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  font-size: 16px;
+}
+.reminder input[type='time'] {
+  grid-area: time;
+  width: 100%;
+  font-family: var(--mono);
+}
+.reminder input:not([type='time']) {
+  grid-area: label;
+  width: 100%;
+}
+.reminder .ghost {
+  grid-area: del;
+}
+.reminder-g {
+  grid-area: g;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 4px 0;
+}
+.reminder + .btn-row,
+.hint + .reminder {
+  margin-top: 12px;
+}
+.btn-row + .hint + .hint,
+.btn-row ~ .hint {
+  margin-top: 12px;
+}
+
 /* ───── Dolna nawigacja ───── */
 .nav {
   position: fixed;

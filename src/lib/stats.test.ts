@@ -110,3 +110,34 @@ describe('tydzień i miesiąc', () => {
     expect(m).toMatchObject({ weeks: 2, weeksMet: 1 });
   });
 });
+
+describe('przypomnienia w kalendarzu', async () => {
+  const { buildIcs, googleUrl, reminderSpan } = await import('./ics');
+  const s = state([check('a')]);
+  s.settings.reminders = [{ id: 'am', time: '07:30', label: 'Woda, rozciąganie; skincare' }];
+
+  it('powtarza codziennie do końca wyzwania', () => {
+    expect(reminderSpan(s, '2026-11-13')).toEqual({ first: '2026-11-13', count: 79 });
+    expect(reminderSpan(s, '2026-10-01')).toEqual({ first: '2026-11-02', count: 90 });
+    expect(reminderSpan(s, '2027-03-01').count).toBe(30);
+  });
+
+  it('tworzy poprawny plik .ics', () => {
+    const ics = buildIcs(s, '2026-11-13', 'https://example.test/app/', new Date('2026-11-13T10:00:00Z'));
+    expect(ics.startsWith('BEGIN:VCALENDAR\r\n')).toBe(true);
+    expect(ics.endsWith('END:VCALENDAR\r\n')).toBe(true);
+    expect(ics).toContain('DTSTART:20261113T073000\r\n');
+    expect(ics).toContain('DTEND:20261113T073500\r\n');
+    expect(ics).toContain('RRULE:FREQ=DAILY;COUNT=79\r\n');
+    expect(ics).toContain('UID:winter-arc-am@winter-arc\r\n');
+    expect(ics).toContain('TRIGGER:PT0M\r\n');
+    expect(ics.replace(/\r\n /g, '')).toContain('SUMMARY:Winter Arc — Woda\\, rozciąganie\\; skincare\r\n');
+    for (const line of ics.split('\r\n')) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
+  });
+
+  it('buduje link do Kalendarza Google', () => {
+    const u = new URL(googleUrl(s, s.settings.reminders![0], '2026-11-13', 'https://example.test/app/'));
+    expect(u.searchParams.get('dates')).toBe('20261113T073000/20261113T073500');
+    expect(u.searchParams.get('recur')).toBe('RRULE:FREQ=DAILY;COUNT=79');
+  });
+});

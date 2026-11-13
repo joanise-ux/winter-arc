@@ -28,9 +28,16 @@ export interface Workout {
   note?: string;
 }
 
+export interface Reminder {
+  id: string;
+  /** HH:MM, czas lokalny */
+  time: string;
+  label: string;
+}
+
 export interface AppState {
   version: 1;
-  settings: { startDate: string; length: number };
+  settings: { startDate: string; length: number; reminders?: Reminder[] };
   tasks: Task[];
   log: Record<string, Record<string, number>>;
   workouts: Workout[];

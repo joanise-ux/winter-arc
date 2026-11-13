@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { isValidKey, todayKey } from './dates';
 import { defaultState } from './defaults';
-import type { AppState, Task, Workout } from './types';
+import type { AppState, Reminder, Task, Workout } from './types';
 
 const KEY = 'winter-arc:v1';
 
@@ -58,7 +58,7 @@ const subscribe = (l: () => void) => {
 export const getState = () => state;
 export const useAppState = () => useSyncExternalStore(subscribe, getState);
 
-const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+export const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 const round = (n: number) => Math.round(n * 100) / 100;
 
 export const actions = {
@@ -121,6 +121,10 @@ export const actions = {
       // zadania obowiązujące od dawnego startu (lub wcześniej niż nowy) przesuwają się razem z nim
       tasks: state.tasks.map((t) => (t.createdAt === old || t.createdAt < startDate ? { ...t, createdAt: startDate } : t)),
     });
+  },
+
+  setReminders(reminders: Reminder[]) {
+    set({ ...state, settings: { ...state.settings, reminders } });
   },
 
   importState(next: AppState) {
