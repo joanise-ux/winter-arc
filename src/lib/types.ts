@@ -35,12 +35,23 @@ export interface Reminder {
   label: string;
 }
 
+/** Pomiary ciała z jednego dnia; każde pole opcjonalne. Waga w kg, obwody w cm. */
+export interface Measurement {
+  weight?: number;
+  waist?: number;
+  hips?: number;
+  chest?: number;
+  thigh?: number;
+  arm?: number;
+}
+
 export interface AppState {
   version: 1;
   settings: { startDate: string; length: number; reminders?: Reminder[] };
   tasks: Task[];
   log: Record<string, Record<string, number>>;
   workouts: Workout[];
+  measurements?: Record<string, Measurement>;
 }
 
 export const CATEGORY_LABEL: Record<Category, string> = {

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MeasureCard } from '../components/MeasureCard';
 import { PhotoCard } from '../components/PhotoCard';
 import { Bar, Card, PeriodNav, Stat, pctText } from '../components/ui';
 import { DOW_SHORT, addDays, fmtNum, fmtShort, parseKey, startOfWeek } from '../lib/dates';
@@ -133,6 +134,8 @@ export function Week({ today }: { today: string }) {
       <Card code="W4" title="Zadania dzienne">
         <TaskRates rates={w.perTask.filter((r) => r.task.kind === 'check')} />
       </Card>
+
+      <MeasureCard weekStart={weekStart} today={today} />
 
       <PhotoCard weekStart={weekStart} today={today} onJump={setWeekStart} />
     </>

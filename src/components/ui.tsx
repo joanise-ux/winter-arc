@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 /** Karta w stylu HUD: cienka ramka, klamry w rogach, etykieta kodowa. */
 export function Card({ code, title, aside, children, className = '' }: { code?: string; title?: string; aside?: ReactNode; children: ReactNode; className?: string }) {
@@ -61,7 +62,8 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
       document.body.style.overflow = '';
     };
   }, [onClose]);
-  return (
+  // portal: karty mają backdrop-filter, przez co „fixed” wewnątrz nich nie przykrywałby całego ekranu
+  return createPortal(
     <div className="backdrop" onClick={onClose}>
       <div className="sheet" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-head">
@@ -70,7 +72,8 @@ export function Sheet({ title, onClose, children }: { title: string; onClose: ()
         </div>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

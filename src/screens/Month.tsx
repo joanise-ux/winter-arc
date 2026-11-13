@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Card, PeriodNav, Stat, pctText } from '../components/ui';
-import { DOW_SHORT, fmtMonth, fmtNum, parseKey } from '../lib/dates';
+import { DOW_SHORT, fmtMonth, fmtNum, fmtShort, parseKey } from '../lib/dates';
+import { MEASURES, change, fmtDelta, series } from '../lib/measure';
 import { PASS, monthSummary, type CounterStat } from '../lib/stats';
+import type { AppState } from '../lib/types';
 import { useAppState } from '../lib/store';
 import { CounterList, TaskRates, WorkoutSummary } from './Week';
 
@@ -24,6 +26,62 @@ function Spark({ c }: { c: CounterStat }) {
         {n > 1 ? <polyline points={c.series.map((v, i) => `${x(i)},${y(v)}`).join(' ')} /> : <circle cx="50" cy={y(c.series[0])} r="1.5" />}
       </svg>
     </div>
+  );
+}
+
+function BodyCard({ s, from, to }: { s: AppState; from: string; to: string }) {
+  const weight = series(s, 'weight');
+  const rows = MEASURES.map((f) => ({ f, c: change(series(s, f.key, from, to)) })).filter((r) => r.c);
+  if (!weight.length && !rows.length) return null;
+
+  const vals = weight.map((p) => p.value);
+  const lo = Math.min(...vals);
+  const hi = Math.max(...vals);
+  const pad = Math.max(0.5, (hi - lo) * 0.15);
+  const n = weight.length;
+  const x = (i: number) => (n === 1 ? 50 : (i / (n - 1)) * 100);
+  const y = (v: number) => 30 - ((v - (lo - pad)) / (hi - lo + 2 * pad)) * 28;
+
+  return (
+    <Card code="M5" title="Waga i wymiary">
+      {n > 0 && (
+        <div className="spark first">
+          <div className="line-top">
+            <span>Waga — całe wyzwanie</span>
+            <span className="mono dim">
+              {fmtNum(lo)}–{fmtNum(hi)} kg
+            </span>
+          </div>
+          <svg viewBox="0 0 100 32" preserveAspectRatio="none" role="img" aria-label="Wykres wagi w czasie">
+            {n > 1 ? <polyline points={weight.map((p, i) => `${x(i)},${y(p.value)}`).join(' ')} /> : <circle cx="50" cy="16" r="1.5" />}
+          </svg>
+          <div className="line-top mono dim">
+            <span>{fmtShort(weight[0].date)}</span>
+            <span>{fmtShort(weight[n - 1].date)}</span>
+          </div>
+        </div>
+      )}
+      <h3 className="sub">Zmiana w tym miesiącu</h3>
+      {rows.length === 0 && <p className="hint">Brak pomiarów w tym miesiącu.</p>}
+      {rows.map(({ f, c }) => (
+        <div key={f.key} className="line">
+          <div className="line-top">
+            <span>{f.label}</span>
+            <span className="mono">
+              {c!.delta === null ? (
+                <>
+                  {fmtNum(c!.last.value)} {f.unit} <span className="dim">· 1 wpis</span>
+                </>
+              ) : (
+                <>
+                  {fmtNum(c!.first.value)} → {fmtNum(c!.last.value)} {f.unit} <span className={c!.delta === 0 ? 'dim' : 'delta'}>{fmtDelta(c!.delta)}</span>
+                </>
+              )}
+            </span>
+          </div>
+        </div>
+      ))}
+    </Card>
   );
 }
 
@@ -113,7 +171,9 @@ export function Month({ today }: { today: string }) {
         ))}
       </Card>
 
-      <Card code="M5" title="Treningi">
+      <BodyCard s={s} from={m.days[0].date} to={m.days[m.days.length - 1].date} />
+
+      <Card code="M6" title="Treningi">
         <WorkoutSummary w={m.workouts} />
       </Card>
     </>

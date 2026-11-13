@@ -141,3 +141,32 @@ describe('przypomnienia w kalendarzu', async () => {
     expect(u.searchParams.get('recur')).toBe('RRULE:FREQ=DAILY;COUNT=79');
   });
 });
+
+describe('pomiary ciała', async () => {
+  const { change, entries, fmtDelta, series } = await import('./measure');
+  const s = state([]);
+  s.measurements = {
+    '2026-11-16': { weight: 67.2, waist: 72 },
+    '2026-11-02': { weight: 68.5, waist: 75, hips: 98 },
+    '2026-11-09': { weight: 68 },
+    '2026-12-07': { weight: 66.4 },
+  };
+
+  it('porządkuje wpisy i pomija puste pola', () => {
+    expect(entries(s).map((e) => e.date)).toEqual(['2026-11-02', '2026-11-09', '2026-11-16', '2026-12-07']);
+    expect(series(s, 'waist').map((p) => p.value)).toEqual([75, 72]);
+    expect(series(s, 'arm')).toEqual([]);
+  });
+
+  it('liczy zmianę od startu i w obrębie miesiąca', () => {
+    expect(change(series(s, 'weight'))).toMatchObject({ delta: -2.1, last: { date: '2026-12-07', value: 66.4 } });
+    expect(change(series(s, 'weight', '2026-11-01', '2026-11-30'))!.delta).toBe(-1.3);
+    expect(change(series(s, 'hips'))).toMatchObject({ delta: null, last: { value: 98 } });
+    expect(change(series(s, 'weight', '2026-12-01', '2026-12-31'))!.delta).toBeNull();
+    expect(change(series(s, 'arm'))).toBeNull();
+  });
+
+  it('formatuje różnicę', () => {
+    expect([fmtDelta(-3), fmtDelta(0.5), fmtDelta(0)]).toEqual(['−3', '+0,5', '0']);
+  });
+});

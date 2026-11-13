@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { isValidKey, todayKey } from './dates';
 import { defaultState } from './defaults';
-import type { AppState, Reminder, Task, Workout } from './types';
+import type { AppState, Measurement, Reminder, Task, Workout } from './types';
 
 const KEY = 'winter-arc:v1';
 
@@ -125,6 +125,16 @@ export const actions = {
 
   setReminders(reminders: Reminder[]) {
     set({ ...state, settings: { ...state.settings, reminders } });
+  },
+
+  /** Jeden wpis na dzień — ponowny zapis nadpisuje. */
+  setMeasurement(date: string, values: Measurement) {
+    set({ ...state, measurements: { ...state.measurements, [date]: values } });
+  },
+
+  deleteMeasurement(date: string) {
+    const { [date]: _gone, ...rest } = state.measurements ?? {};
+    set({ ...state, measurements: rest });
   },
 
   importState(next: AppState) {
