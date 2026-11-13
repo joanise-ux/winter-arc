@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { MealCard } from '../components/MealCard';
 import { Bar, Card, Chips, PeriodNav, Ring, Sheet, parseNum } from '../components/ui';
 import { addDays, fmtDay, fmtNum, fmtShort, startOfWeek } from '../lib/dates';
-import { PASS, currentStreak, dayNumber, dayStats, hasWorkout, isDone, tasksOn, valueOf, weekCount } from '../lib/stats';
+import { proteinOn } from '../lib/meals';
+import { PASS, PROTEIN_ID, currentStreak, dayNumber, dayStats, hasWorkout, isDone, tasksOn, valueOf, weekCount } from '../lib/stats';
 import { actions, useAppState } from '../lib/store';
 import { CATEGORIES, CATEGORY_LABEL, WORKOUT_LABEL, WORKOUT_TYPES, type Task, type WorkoutType } from '../lib/types';
 
@@ -11,9 +13,12 @@ function Counter({ task, date }: { task: Task; date: string }) {
   const target = task.target ?? 1;
   const step = task.step ?? 1;
   const done = v >= target;
+  // część wartości może pochodzić z posiłków — przyciski i wpisywanie zmieniają tylko resztę
+  const fromMeals = task.id === PROTEIN_ID ? proteinOn(s, date) : 0;
+  const manual = s.log[date]?.[task.id] ?? 0;
   const commit = (raw: string) => {
     const n = parseNum(raw);
-    if (!Number.isNaN(n)) actions.setValue(date, task.id, n);
+    if (!Number.isNaN(n)) actions.setValue(date, task.id, n - fromMeals);
   };
   return (
     <div className={`counter ${done ? 'done' : ''}`}>
@@ -36,11 +41,12 @@ function Counter({ task, date }: { task: Task; date: string }) {
         </span>
       </div>
       <Bar pct={v / target} done={done} />
+      {fromMeals > 0 && <span className="counter-note">w tym {fmtNum(fromMeals)} g z posiłków</span>}
       <div className="counter-btns">
-        <button onClick={() => actions.setValue(date, task.id, v - step)} disabled={v <= 0} aria-label={`${task.title}: odejmij ${fmtNum(step)}`}>
+        <button onClick={() => actions.setValue(date, task.id, manual - step)} disabled={manual <= 0} aria-label={`${task.title}: odejmij ${fmtNum(step)}`}>
           −
         </button>
-        <button onClick={() => actions.setValue(date, task.id, v + step)} aria-label={`${task.title}: dodaj ${fmtNum(step)}`}>
+        <button onClick={() => actions.setValue(date, task.id, manual + step)} aria-label={`${task.title}: dodaj ${fmtNum(step)}`}>
           + {fmtNum(step)}
         </button>
       </div>
@@ -163,8 +169,10 @@ export function Today({ today }: { today: string }) {
         </Card>
       )}
 
+      {!notStarted && <MealCard date={date} code="02" />}
+
       {checks.length > 0 && (
-        <Card code="02" title="Zadania dnia" aside={<span className="mono dim">{checks.filter((t) => isDone(s, t, date)).length}/{checks.length}</span>}>
+        <Card code="03" title="Zadania dnia" aside={<span className="mono dim">{checks.filter((t) => isDone(s, t, date)).length}/{checks.length}</span>}>
           {CATEGORIES.map((c) => {
             const list = checks.filter((t) => t.category === c);
             if (!list.length) return null;
@@ -181,7 +189,7 @@ export function Today({ today }: { today: string }) {
       )}
 
       {weekly.length > 0 && (
-        <Card code="03" title="Wyzwania tygodnia">
+        <Card code="04" title="Wyzwania tygodnia">
           {weekly.map((t) => {
             const goal = t.timesPerWeek ?? 1;
             const count = weekCount(s, t, weekStart);
@@ -207,7 +215,7 @@ export function Today({ today }: { today: string }) {
       )}
 
       {!notStarted && (
-        <Card code="04" title="Trening" aside={<button className="small" onClick={() => setSheet(true)}>+ Dodaj</button>}>
+        <Card code="05" title="Trening" aside={<button className="small" onClick={() => setSheet(true)}>+ Dodaj</button>}>
           {workouts.length === 0 ? (
             <p className="hint">Brak treningu w tym dniu.</p>
           ) : (

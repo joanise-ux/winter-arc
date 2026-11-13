@@ -874,6 +874,76 @@ main {
   background: rgba(var(--accent-rgb), 0.12);
 }
 
+/* ───── Posiłki ───── */
+.kcal {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.kcal-v {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.kcal-p {
+  margin-left: auto;
+  color: var(--sand);
+}
+.kcal-left {
+  margin-top: 8px;
+}
+.kcal-left + .group,
+.kcal + .group {
+  margin-top: 14px;
+}
+.meal-k {
+  flex: none;
+  color: var(--muted) !important;
+}
+.quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.quick button {
+  min-height: 40px;
+  padding: 4px 12px;
+  background: var(--raised);
+  border: 1px solid var(--line-strong);
+  font-size: 14px;
+  text-align: left;
+}
+.quick small {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  align-items: end;
+}
+.counter-note {
+  font-size: 11px;
+  color: var(--sand);
+}
+.k-bar {
+  fill: var(--sand);
+}
+.k-bar.in {
+  fill: var(--accent);
+}
+.stats + .spark {
+  margin-top: 14px;
+}
+
 /* ───── Pomiary ciała ───── */
 .measures {
   display: grid;

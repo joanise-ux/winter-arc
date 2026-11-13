@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Card, Sheet } from '../components/ui';
 import { addDays, fmtShort, isValidKey, todayKey } from '../lib/dates';
+import { DEFAULT_KCAL_GOAL, kcalGoalOf } from '../lib/meals';
 import { buildIcs, googleUrl, isTime, reminderSpan, remindersOf } from '../lib/ics';
 import { clearPhotos, exportPhotos, importPhotos } from '../lib/photos';
 import { actions, isAppState, uid, useAppState } from '../lib/store';
@@ -94,7 +95,28 @@ export function Settings() {
         </p>
       </Card>
 
-      <Card code="S2" title="Przypomnienia">
+      <Card code="S2" title="Dieta">
+        <label className="field">
+          <span>Dzienny cel kalorii (kcal)</span>
+          <input
+            key={kcalGoalOf(s)}
+            inputMode="numeric"
+            defaultValue={kcalGoalOf(s) || ''}
+            placeholder="bez celu"
+            onBlur={(e) => {
+              const n = e.target.value.trim() ? Math.round(Number(e.target.value.replace(/\s/g, '').replace(',', '.'))) : 0;
+              if (Number.isFinite(n) && n >= 0 && n <= 10000) actions.setKcalGoal(n);
+              else e.target.value = String(kcalGoalOf(s) || '');
+            }}
+            onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+          />
+        </label>
+        <p className="hint">
+          Domyślnie {DEFAULT_KCAL_GOAL} kcal. Zostaw puste, żeby widzieć samą sumę bez celu. Kalorie nie wpływają na procent wykonania dnia.
+        </p>
+      </Card>
+
+      <Card code="S3" title="Przypomnienia">
         <p className="hint">
           Przypomnienia trafiają do kalendarza telefonu, więc działają także przy zamkniętej aplikacji. Codziennie przez {span.count} dni, od {fmtShort(span.first)}.
         </p>
@@ -126,7 +148,7 @@ export function Settings() {
         <p className="hint">Po zmianie godzin dodaj je ponownie. Żeby wyłączyć przypomnienie, usuń wydarzenie „Winter Arc” w kalendarzu.</p>
       </Card>
 
-      <Card code="S3" title="Instalacja na telefonie">
+      <Card code="S4" title="Instalacja na telefonie">
         {standalone ? (
           <p className="hint">Aplikacja jest zainstalowana i działa offline.</p>
         ) : (
@@ -148,7 +170,7 @@ export function Settings() {
         )}
       </Card>
 
-      <Card code="S4" title="Kopia zapasowa">
+      <Card code="S5" title="Kopia zapasowa">
         <p className="hint">Dane i zdjęcia są zapisane tylko na tym urządzeniu. Zrób kopię, zanim wyczyścisz przeglądarkę albo zmienisz telefon.</p>
         <div className="btn-row">
           <button className="secondary" onClick={exportData}>
@@ -166,7 +188,7 @@ export function Settings() {
         )}
       </Card>
 
-      <Card code="S5" title="Reset">
+      <Card code="S6" title="Reset">
         <button className="danger" onClick={() => setConfirmReset(true)}>
           Wyczyść wszystkie dane
         </button>

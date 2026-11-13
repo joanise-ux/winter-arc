@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { isValidKey, todayKey } from './dates';
 import { defaultState } from './defaults';
-import type { AppState, Measurement, Reminder, Task, Workout } from './types';
+import type { AppState, Meal, Measurement, Reminder, Task, Workout } from './types';
 
 const KEY = 'winter-arc:v1';
 
@@ -135,6 +135,23 @@ export const actions = {
   deleteMeasurement(date: string) {
     const { [date]: _gone, ...rest } = state.measurements ?? {};
     set({ ...state, measurements: rest });
+  },
+
+  addMeal(meal: Omit<Meal, 'id'>) {
+    set({ ...state, meals: [...(state.meals ?? []), { ...meal, id: uid() }] });
+  },
+
+  updateMeal(id: string, patch: Omit<Meal, 'id'>) {
+    set({ ...state, meals: (state.meals ?? []).map((m) => (m.id === id ? { ...patch, id } : m)) });
+  },
+
+  removeMeal(id: string) {
+    set({ ...state, meals: (state.meals ?? []).filter((m) => m.id !== id) });
+  },
+
+  /** 0 wyłącza cel kalorii. */
+  setKcalGoal(kcalGoal: number) {
+    set({ ...state, settings: { ...state.settings, kcalGoal } });
   },
 
   importState(next: AppState) {

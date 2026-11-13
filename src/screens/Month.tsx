@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MealSummary } from '../components/MealCard';
 import { Card, PeriodNav, Stat, pctText } from '../components/ui';
 import { DOW_SHORT, fmtMonth, fmtNum, fmtShort, parseKey } from '../lib/dates';
 import { MEASURES, change, fmtDelta, series } from '../lib/measure';
@@ -43,7 +44,7 @@ function BodyCard({ s, from, to }: { s: AppState; from: string; to: string }) {
   const y = (v: number) => 30 - ((v - (lo - pad)) / (hi - lo + 2 * pad)) * 28;
 
   return (
-    <Card code="M5" title="Waga i wymiary">
+    <Card code="M6" title="Waga i wymiary">
       {n > 0 && (
         <div className="spark first">
           <div className="line-top">
@@ -171,9 +172,11 @@ export function Month({ today }: { today: string }) {
         ))}
       </Card>
 
+      <MealSummary code="M5" dates={m.days.map((d) => d.date)} today={today} chart />
+
       <BodyCard s={s} from={m.days[0].date} to={m.days[m.days.length - 1].date} />
 
-      <Card code="M6" title="Treningi">
+      <Card code="M7" title="Treningi">
         <WorkoutSummary w={m.workouts} />
       </Card>
     </>

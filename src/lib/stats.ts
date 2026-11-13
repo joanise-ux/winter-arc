@@ -1,8 +1,11 @@
 import { addDays, diffDays, monthDays, startOfWeek, weekDays } from './dates';
+import { proteinOn } from './meals';
 import type { AppState, Task, WorkoutType } from './types';
 
 /** Dzień jest „zaliczony”, gdy wykonano co najmniej tyle zadań dziennych. */
 export const PASS = 0.8;
+
+export const PROTEIN_ID = 'protein';
 
 export function isActive(t: Task, date: string): boolean {
   return t.createdAt <= date && (!t.archivedAt || date < t.archivedAt);
@@ -18,6 +21,8 @@ export function hasWorkout(s: AppState, date: string): boolean {
 
 export function valueOf(s: AppState, t: Task, date: string): number {
   const v = s.log[date]?.[t.id] ?? 0;
+  // białko z dziennika posiłków dolicza się do licznika „Białko”
+  if (t.id === PROTEIN_ID && t.kind === 'counter') return Math.round((v + proteinOn(s, date)) * 100) / 100;
   if (t.auto === 'workout' && v < 1 && hasWorkout(s, date)) return 1;
   return v;
 }

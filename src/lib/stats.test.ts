@@ -170,3 +170,38 @@ describe('pomiary ciała', async () => {
     expect([fmtDelta(-3), fmtDelta(0.5), fmtDelta(0)]).toEqual(['−3', '+0,5', '0']);
   });
 });
+
+describe('posiłki i kalorie', async () => {
+  const { dayTotals, rangeMeals, recentMeals, kcalGoalOf, slotForHour } = await import('./meals');
+  const { valueOf } = await import('./stats');
+  const protein: Task = { ...check('protein'), kind: 'counter', target: 100 };
+  const s = state([protein], { '2026-11-02': { protein: 40 } });
+  s.meals = [
+    { id: '1', date: '2026-11-02', slot: 'breakfast', name: 'Owsianka', kcal: 450, protein: 20 },
+    { id: '2', date: '2026-11-02', slot: 'lunch', name: 'Kurczak z ryżem', kcal: 700, protein: 45.5 },
+    { id: '3', date: '2026-11-03', slot: 'breakfast', name: 'owsianka ', kcal: 480, protein: 22 },
+    { id: '4', date: '2026-11-03', slot: 'snack', name: 'Jabłko', kcal: 1500 },
+  ];
+
+  it('sumuje dzień i dolicza białko do licznika', () => {
+    expect(dayTotals(s, '2026-11-02')).toEqual({ count: 2, kcal: 1150, protein: 65.5 });
+    expect(valueOf(s, protein, '2026-11-02')).toBe(105.5);
+    expect(dayStats(s, '2026-11-02', '2026-11-03')).toMatchObject({ done: 1, total: 1 });
+    expect(valueOf(s, protein, '2026-11-04')).toBe(0);
+  });
+
+  it('średnie liczy tylko z dni z wpisami, a cel z tolerancją ±10%', () => {
+    expect(kcalGoalOf(s)).toBe(2000);
+    const r = rangeMeals(s, weekDays('2026-11-02'));
+    expect(r).toMatchObject({ loggedDays: 2, meals: 4, avgKcal: 1565, avgProtein: 44, goalDays: 1 });
+    s.settings.kcalGoal = 0;
+    expect(rangeMeals(s, weekDays('2026-11-02')).goalDays).toBe(0);
+    expect(rangeMeals(s, weekDays('2026-11-09')).avgKcal).toBeNull();
+    delete s.settings.kcalGoal;
+  });
+
+  it('podpowiada ostatnie posiłki bez powtórek', () => {
+    expect(recentMeals(s).map((m) => m.id)).toEqual(['4', '3', '2']);
+    expect([slotForHour(8), slotForHour(13), slotForHour(17), slotForHour(20)]).toEqual(['breakfast', 'lunch', 'snack', 'dinner']);
+  });
+});

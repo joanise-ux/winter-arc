@@ -45,13 +45,26 @@ export interface Measurement {
   arm?: number;
 }
 
+export type MealSlot = 'breakfast' | 'lunch' | 'dinner' | 'snack';
+
+export interface Meal {
+  id: string;
+  date: string;
+  slot: MealSlot;
+  name: string;
+  kcal: number;
+  /** gramy białka; doliczane do licznika „Białko” */
+  protein?: number;
+}
+
 export interface AppState {
   version: 1;
-  settings: { startDate: string; length: number; reminders?: Reminder[] };
+  settings: { startDate: string; length: number; reminders?: Reminder[]; /** 0 = bez celu */ kcalGoal?: number };
   tasks: Task[];
   log: Record<string, Record<string, number>>;
   workouts: Workout[];
   measurements?: Record<string, Measurement>;
+  meals?: Meal[];
 }
 
 export const CATEGORY_LABEL: Record<Category, string> = {

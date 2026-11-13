@@ -95,7 +95,7 @@ export function MeasureCard({ weekStart, today }: { weekStart: string; today: st
   const defaultDate = today <= weekEnd ? today : weekEnd;
 
   return (
-    <Card code="W5" title="Pomiary" aside={canAdd ? <button className="small" onClick={() => setForm(defaultDate)}>+ Pomiar</button> : undefined}>
+    <Card code="W6" title="Pomiary" aside={canAdd ? <button className="small" onClick={() => setForm(defaultDate)}>+ Pomiar</button> : undefined}>
       {all.length === 0 ? (
         <p className="hint">Zapisuj wagę i obwody raz w tygodniu — zobaczysz zmianę od startu i trend w miesiącu.</p>
       ) : (

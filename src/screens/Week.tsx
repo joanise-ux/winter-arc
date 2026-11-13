@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { MealSummary } from '../components/MealCard';
 import { MeasureCard } from '../components/MeasureCard';
 import { PhotoCard } from '../components/PhotoCard';
 import { Bar, Card, PeriodNav, Stat, pctText } from '../components/ui';
@@ -134,6 +135,8 @@ export function Week({ today }: { today: string }) {
       <Card code="W4" title="Zadania dzienne">
         <TaskRates rates={w.perTask.filter((r) => r.task.kind === 'check')} />
       </Card>
+
+      <MealSummary code="W5" dates={w.days.map((d) => d.date)} today={today} />
 
       <MeasureCard weekStart={weekStart} today={today} />
 

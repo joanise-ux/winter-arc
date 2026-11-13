@@ -38,7 +38,7 @@ export function PhotoCard({ weekStart, today, onJump }: { weekStart: string; tod
   );
 
   return (
-    <Card code="W6" title="Zdjęcie tygodnia" aside={canAdd ? pick : undefined}>
+    <Card code="W7" title="Zdjęcie tygodnia" aside={canAdd ? pick : undefined}>
       <input ref={input} type="file" accept="image/*" hidden aria-label="Wybierz zdjęcie tygodnia" onChange={(e) => onFile(e.target.files?.[0])} />
 
       {current ? (
